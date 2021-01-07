@@ -22,7 +22,7 @@ def display_app_header(main_txt,sub_txt,is_sidebar = False):
     """
 
     html_temp = f"""
-    <div style = "background.color:#0011ff  ; padding:15px">
+    <div style = "background.color:#3c403f  ; padding:15px">
     <h2 style = "color:white; text_align:center;"> {main_txt} </h2>
     <p style = "color:white; text_align:center;"> {sub_txt} </p>
     </div>
@@ -88,11 +88,11 @@ def main():
     subtitle = """
             A [GPT-2](https://huggingface.co/blog/how-to-generate) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
-**Instructions:** Type in a fake song title, pick an artist, and fake lyrics will be generated. The generator will be pre-seeded with a random title & artist initially. 
+            **Instructions:** Type in a fake song title, pick an artist, and fake lyrics will be generated. The generator will be pre-seeded with a random title & artist initially. 
 
-Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles). I have made no attempt to censor lyrics whatsoever.
+            Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles). I have made no attempt to censor lyrics whatsoever.
 
-Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
+            Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
 
             [Repository](https://github.com/bigjoedata/rockbot)  
             [Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)  
@@ -112,7 +112,8 @@ Finally, these lyrics are computer generated. Not all of these will be non-repet
 
     #st.text(prompt)
 
-    ai = load_aitextgen()
+    with st.spinner("Initial model loading, please be patient"):
+        ai = load_aitextgen()
     display_side_panel_header("Configuration")
     #st.sidebar.subheader("Configuration")
     nsamples = st.sidebar.number_input("Number of Songs To Generate: ", 1, 10, 5)
@@ -127,7 +128,9 @@ Finally, these lyrics are computer generated. Not all of these will be non-repet
     no_repeat_ngram_size = st.sidebar.slider("No Repeat N-Gram Size. Eliminates repeated phrases of N Length", 0, 6, 3)
 
 
-    generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
+    with st.spinner("Generating text, please be patient, this can take a minute or two..."):
+        generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
+        st.balloons()
 
     st.header("Your songs")
 
