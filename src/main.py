@@ -47,7 +47,7 @@ def load_aitextgen():
 
 @st.cache
 def artistsload():
-    df=pd.read_parquet('./theartists.parquet')
+    df=pd.read_parquet('theartists.parquet')
     randart=random.randint(0, len(df))
     #df = df.iloc[:, 0].apply(lambda x: x.title())
     #df = df.iloc[1:].reset_index(drop=True)
