@@ -33,7 +33,7 @@ def display_side_panel_header(txt):
     """
     st.sidebar.markdown(f'## {txt}')
 
-@st.cache(allow_output_mutation=True, ttl=600) #, max_entries=1
+@st.cache(allow_output_mutation=True, ttl=120000, max_entries=1)
 def load_aitextgen():
     return aitextgen(model="bigjoedata/rockbot")
 
@@ -42,7 +42,7 @@ def artistsload():
     df=pd.read_parquet('theartists.parquet')
     return df
 
-@st.cache(ttl=1200)
+@st.cache(ttl=1200, max_entries=1)
 def setseeds(df):
     randart=random.randint(0, len(df))
     sampletitles=[
@@ -69,7 +69,7 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
         temperature=temperature,
         #top_k=topk,
         top_p=topp,
-        #repetition_penalty=4.0, # disabled to reduce memory usage
+        #repetition_penalty=4.0, # disabled to reduce CPU/GPU usage
         no_repeat_ngram_size=no_repeat_ngram_size,
         do_sample=True, 
         return_as_list=True,
@@ -113,8 +113,8 @@ def main():
         "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 9)], 256
     ) # Max is really 1024 with this model but set at 512 here to reduce max memory consumption
     display_side_panel_header("Fine-Tuning")
-    temperature = st.sidebar.slider("Choose temperature. Higher means more creative (crazier): ", 0.0, 1.0, 0.8, 0.1)
-    topk = st.sidebar.slider("Choose Top K. Limits next word choice to top k guesses; higher is more random:", 0, 50, 25)
+    temperature = st.sidebar.slider("Choose temperature. Higher means more creative (crazier): ", 0.0, 1.0, 0.7, 0.1)
+    topk = st.sidebar.slider("Choose Top K. Limits next word choice to top k guesses; higher is more random:", 0, 50, 40)
     topp = st.sidebar.slider("Choose Top P. Limits next word choice to higher probability; lower is more random:", 0.0, 1.0, 0.9, 0.05)
     no_repeat_ngram_size = st.sidebar.slider("No Repeat N-Gram Size. Eliminates repeated phrases of N Length", 0, 6, 3)
 
