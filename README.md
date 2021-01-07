@@ -2,20 +2,22 @@
 # 🎸 🥁 Rockbot 🎤 🎧 
 A [GPT-2](https://huggingface.co/blog/how-to-generate) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
-**Instructions:** Type in a fake song title, pick an artist, and fake lyrics will be generated. The generator will be pre-seeded with a random title & artist initially. 
+**Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
-Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles). I have made no attempt to censor lyrics whatsoever.
+Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles), especially if you change the configuration to allow more entropy. I have made no attempt to censor lyrics whatsoever.
 
 Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
 
 [Repository](https://github.com/bigjoedata/rockbot)
+
 [Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+
 🎹 🪘 🎷 🎺 🪗  🪕 🎻
 ## Background
 With the shutdown of [Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music) I used Google's takeout function to gather the metadata from artists I've listened to over the past several years. I wanted to take advantage of this bounty to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), then fine tuned [GPT-2's](https://openai.com/blog/better-language-models/) 124M token model using the [AITextGen](https://github.com/minimaxir/aitextgen) framework after considerable post-processing.
 
 ### Full Tech Stack
-[Google Play Music (R.I.P.)](https://en.wikipedia.org/wiki/Google_Play_Music). 
+[Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music)  (R.I.P.). 
 [Python](https://www.python.org/). 
 [Streamlit](https://www.streamlit.io/). 
 [GPT-2](https://openai.com/blog/better-language-models/). 
