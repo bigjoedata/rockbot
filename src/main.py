@@ -1,15 +1,7 @@
-# https://huggingface.co/blog/how-to-generate
-
 import pandas as pd
 import streamlit as st
 from aitextgen import aitextgen
 import random
-
-def showhelpselect():
-    showhelp = st.sidebar.checkbox(' ℹ Show Help')
-    if showhelp:
-        st.sidebar.info('Help appears in these blue boxes')
-    return showhelp
 
 def display_app_header(main_txt,sub_txt,is_sidebar = False):
     """
@@ -41,16 +33,18 @@ def display_side_panel_header(txt):
     """
     st.sidebar.markdown(f'## {txt}')
 
-@st.cache(allow_output_mutation=True, ttl=600, max_entries=1)
+@st.cache(allow_output_mutation=True, ttl=600) #, max_entries=1
 def load_aitextgen():
     return aitextgen(model="bigjoedata/rockbot")
 
 @st.cache
 def artistsload():
     df=pd.read_parquet('theartists.parquet')
+    return df
+
+@st.cache(ttl=1200)
+def setseeds(df):
     randart=random.randint(0, len(df))
-    #df = df.iloc[:, 0].apply(lambda x: x.title())
-    #df = df.iloc[1:].reset_index(drop=True)
     sampletitles=[
         'Love Is A Vampire',
         'The Cards Are Against Humanity',
@@ -63,12 +57,13 @@ def artistsload():
         'Panic In The Grocery Store'
     ]
     randtitle = random.choice(sampletitles)
-    return df, randart, randtitle
+    return randart, randtitle
 
 def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size):
+    nsamples = min(nsamples, 5)
     return ai.generate(
         n=nsamples,
-        #batch_size=nsamples, # disabled to reduce memory usage
+        batch_size=nsamples, # disabled to reduce memory usage
         prompt=prefix,
         max_length=length_gen,
         temperature=temperature,
@@ -81,8 +76,6 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
         eos_token = "<|endoftext|>",
         bos_token = "<|startoftext|>"
     )
-
-
 
 def main():
     main_txt = """🎸 🥁 Rockbot 🎤 🎧"""
@@ -103,30 +96,26 @@ def main():
     display_app_header(main_txt,sub_txt,is_sidebar = False)
     st.markdown(subtitle)
 
-    artists, randart, randtitle = artistsload()
+    artists = artistsload()
+    randart, randtitle = setseeds(artists)
+    
     songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).title()
-    #songtitle = songtitle.split()[:4]
-
     artist = st.selectbox("in the style of: ", artists, randart)
 
     prompt = songtitle + "\nBY\n" + artist + "\n"
     yoursong = songtitle + " BY " + artist
 
-    #st.text(prompt)
-
     with st.spinner("Initial model loading, please be patient"):
         ai = load_aitextgen()
     display_side_panel_header("Configuration")
-    #st.sidebar.subheader("Configuration")
-    nsamples = st.sidebar.number_input("Number of Songs To Generate: ", 1, 10, 5)
-    #st.sidebar.info("Number of Songs To Generate")
+    nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, 10, 5)
     length_gen = st.sidebar.select_slider(
         "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 9)], 256
     ) # Max is really 1024 with this model but set at 512 here to reduce max memory consumption
     display_side_panel_header("Fine-Tuning")
     temperature = st.sidebar.slider("Choose temperature. Higher means more creative (crazier): ", 0.0, 1.0, 0.8, 0.1)
-    topk = st.sidebar.slider("Choose top_k. Limits next word choice to top k guesses; higher is more random:", 0, 50, 25)
-    topp = st.sidebar.slider("Choose top_p. Limits next word choice to higher probability; lower is more random:", 0.0, 1.0, 0.9, 0.05)
+    topk = st.sidebar.slider("Choose Top K. Limits next word choice to top k guesses; higher is more random:", 0, 50, 25)
+    topp = st.sidebar.slider("Choose Top P. Limits next word choice to higher probability; lower is more random:", 0.0, 1.0, 0.9, 0.05)
     no_repeat_ngram_size = st.sidebar.slider("No Repeat N-Gram Size. Eliminates repeated phrases of N Length", 0, 6, 3)
 
     if st.button('Generate My Songs!'):
