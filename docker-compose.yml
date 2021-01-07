@@ -2,11 +2,11 @@ version: "3.7"
 services:
   streamlit-plus:
     container_name: streamlit-plus
-    image: intelligentdesigns/streamlit-plus-extra:latest
+    image: a77446281a89 #intelligentdesigns/streamlit-plus-extra:latest
     restart: unless-stopped
 # Uncomment and edit volumes to mount your own project
-    volumes:
-      - ./src:/app
+#    volumes:
+#      - ./src:/app
 # Uncomment this line and add your own custom index as needed (e.g., for injecting Google Analytics or other tracking)
 #      - /home/user/custom/index.html:/root/.local/lib/python3.8/site-packages/streamlit/static/index.html
     ports:

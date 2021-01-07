@@ -35,11 +35,13 @@ def display_side_panel_header(txt):
 
 @st.cache(allow_output_mutation=True, ttl=120000, max_entries=1)
 def load_aitextgen():
-    return aitextgen(model="bigjoedata/rockbot")
+    # return aitextgen(model="bigjoedata/rockbot") # This is fine-tuned on the 355M token GPT-2 Model
+    return aitextgen(model="bigjoedata/rockbot-distilgpt2") # This is 60% lighter due to being fine-tuned on the reduced Huggingface distilgpt2 Model
 
 @st.cache
 def artistsload():
     df=pd.read_parquet('theartists.parquet')
+    df = df.iloc[:, 0].apply(lambda x: x.upper())
     return df
 
 @st.cache(ttl=1200, max_entries=1)
@@ -82,17 +84,19 @@ def main():
     main_txt = """🎸 🥁 Rockbot 🎤 🎧"""
     sub_txt = ""
     subtitle = """
-        **Instructions:** Type in a fake song title, pick an artist, click "Generate".
-        
-        Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles), especially if you change the configuration to allow more entropy. I have made no attempt to censor lyrics whatsoever.
+            A [DistilGPT-2](https://huggingface.co/distilgpt2) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
-        Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
+            **Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
-        [Repository](https://github.com/bigjoedata/rockbot)
+            Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles), especially if you change the configuration to allow more entropy. I have made no attempt to censor lyrics whatsoever.
 
-        [Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+            Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
 
-        🎹 🪘 🎷 🎺 🪗  🪕 🎻
+            [Github Repository](https://github.com/bigjoedata/rockbot)
+
+            [GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+
+            [DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/)
         """
     display_app_header(main_txt,sub_txt,is_sidebar = False)
     st.markdown(subtitle)
@@ -100,11 +104,10 @@ def main():
     artists = artistsload()
     randart, randtitle = setseeds(artists)
     
-    songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).title()
+    songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).upper()
     artist = st.selectbox("in the style of: ", artists, randart)
 
-    prompt = songtitle + "\nBY\n" + artist + "\n"
-    yoursong = songtitle + " BY " + artist
+    prompt = songtitle.title() + "\nBY\n" + artist.title() + "\n"
 
     with st.spinner("Initial model loading, please be patient"):
         ai = load_aitextgen()
@@ -129,7 +132,7 @@ def main():
         sep = '<|endoftext|>'
 
         for gen in generated:
-            gentext = f"{gen.split(sep, 1)[0]}".replace(prompt, "**" + songtitle + " BY " + artist + "**\n").replace("\n","<br>") + "<hr>"
+            gentext = f"{gen.split(sep, 1)[0]}".replace(prompt, "**" + songtitle.upper() + " BY " + artist.upper() + "**\n").replace("\n","<br>") + "<hr>"
             st.markdown(gentext,  unsafe_allow_html=True)
 
 if __name__ == "__main__":
