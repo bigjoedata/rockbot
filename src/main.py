@@ -74,7 +74,8 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
         do_sample=True, 
         return_as_list=True,
         eos_token = "<|endoftext|>",
-        bos_token = "<|startoftext|>"
+        bos_token = "<|startoftext|>",
+        #num_workers=1 # This parameter doesn't seem to affect CPU usage for generation
     )
 
 def main():
@@ -119,7 +120,7 @@ def main():
     no_repeat_ngram_size = st.sidebar.slider("No Repeat N-Gram Size. Eliminates repeated phrases of N Length", 0, 6, 3)
 
     if st.button('Generate My Songs!'):
-        with st.spinner("Generating songs, please be patient, this can take a minute or two..."):
+        with st.spinner("Generating songs, please be patient, this can take a while..."):
             generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
             st.balloons()
 
