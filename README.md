@@ -1,6 +1,6 @@
 
 # 🎸 🥁 Rockbot 🎤 🎧 
-A [GPT-2](https://huggingface.co/blog/how-to-generate) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
+A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
 **Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
@@ -8,13 +8,15 @@ Note: Due to the nature of language models, lyrics bleed across artists and you 
 
 Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
 
-[Repository](https://github.com/bigjoedata/rockbot)
+[Github Repository](https://github.com/bigjoedata/rockbot)
 
-[Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+[GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+
+[DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/) This is leaner but the lyrics are much more simplistic.
 
 🎹 🪘 🎷 🎺 🪗  🪕 🎻
 ## Background
-With the shutdown of [Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music) I used Google's takeout function to gather the metadata from artists I've listened to over the past several years. I wanted to take advantage of this bounty to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), then fine tuned [GPT-2's](https://openai.com/blog/better-language-models/) 124M token model using the [AITextGen](https://github.com/minimaxir/aitextgen) framework after considerable post-processing.
+With the shutdown of [Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music) I used Google's takeout function to gather the metadata from artists I've listened to over the past several years. I wanted to take advantage of this bounty to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), then fine tuned [GPT-2's](https://openai.com/blog/better-language-models/) 124M token model using the [AITextGen](https://github.com/minimaxir/aitextgen) framework after considerable post-processing. For more on generation, see [here.](https://huggingface.co/blog/how-to-generate)
 
 ### Full Tech Stack
 [Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music)  (R.I.P.). 

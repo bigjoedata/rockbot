@@ -2,6 +2,9 @@ import pandas as pd
 import streamlit as st
 from aitextgen import aitextgen
 import random
+import time
+import streamlit.report_thread as ReportThread
+from streamlit.server.server import Server
 
 def display_app_header(main_txt,sub_txt,is_sidebar = False):
     """
@@ -35,17 +38,17 @@ def display_side_panel_header(txt):
 
 @st.cache(allow_output_mutation=True, ttl=120000, max_entries=1)
 def load_aitextgen():
-    # return aitextgen(model="bigjoedata/rockbot") # This is fine-tuned on the 355M token GPT-2 Model
-    return aitextgen(model="bigjoedata/rockbot-distilgpt2") # This is 60% lighter due to being fine-tuned on the reduced Huggingface distilgpt2 Model
+    return aitextgen(model="bigjoedata/rockbot") # This is fine-tuned on the 124M token GPT-2 Model
+    # return aitextgen(model="bigjoedata/rockbot-distilgpt2") # This is 60% lighter due to being fine-tuned on the reduced Huggingface distilgpt2 Model
 
 @st.cache
 def artistsload():
     df=pd.read_parquet('theartists.parquet')
-    df = df.iloc[:, 0].apply(lambda x: x.upper())
+    #df = df.iloc[:, 0].apply(lambda x: x.upper())
     return df
 
-@st.cache(ttl=1200, max_entries=1)
-def setseeds(df):
+@st.cache(max_entries=1)
+def setseeds(df, session_id):
     randart=random.randint(0, len(df))
     sampletitles=[
         'Love Is A Vampire',
@@ -77,14 +80,16 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
         return_as_list=True,
         eos_token = "<|endoftext|>",
         bos_token = "<|startoftext|>",
+        to_gpu=False
         #num_workers=1 # This parameter doesn't seem to affect CPU usage for generation
     )
 
 def main():
+    st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
     main_txt = """🎸 🥁 Rockbot 🎤 🎧"""
     sub_txt = ""
     subtitle = """
-            A [DistilGPT-2](https://huggingface.co/distilgpt2) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
+            A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
             **Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
@@ -100,21 +105,18 @@ def main():
         """
     display_app_header(main_txt,sub_txt,is_sidebar = False)
     st.markdown(subtitle)
-
+    session_id = ReportThread.get_report_ctx().session_id
     artists = artistsload()
-    randart, randtitle = setseeds(artists)
-    
+    randart, randtitle = setseeds(artists, session_id)
     songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).upper()
     artist = st.selectbox("in the style of: ", artists, randart)
 
     prompt = songtitle.title() + "\nBY\n" + artist.title() + "\n"
 
-    with st.spinner("Initial model loading, please be patient"):
-        ai = load_aitextgen()
     display_side_panel_header("Configuration")
     nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, 10, 5)
     length_gen = st.sidebar.select_slider(
-        "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 9)], 256
+    "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 9)], 256
     ) # Max is really 1024 with this model but set at 512 here to reduce max memory consumption
     display_side_panel_header("Fine-Tuning")
     temperature = st.sidebar.slider("Choose temperature. Higher means more creative (crazier): ", 0.0, 1.0, 0.7, 0.1)
@@ -122,17 +124,20 @@ def main():
     topp = st.sidebar.slider("Choose Top P. Limits next word choice to higher probability; lower is more random:", 0.0, 1.0, 0.9, 0.05)
     no_repeat_ngram_size = st.sidebar.slider("No Repeat N-Gram Size. Eliminates repeated phrases of N Length", 0, 6, 3)
 
+    with st.spinner("Initial model loading, please be patient"):
+        ai = load_aitextgen()
+
+
     if st.button('Generate My Songs!'):
         with st.spinner("Generating songs, please be patient, this can take a while..."):
+            start = time.time()
             generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
-            st.balloons()
-
+            end = time.time()
+            st.markdown("⏲️ " + str(round(end - start)) + "s")
         st.header("Your songs")
-
         sep = '<|endoftext|>'
-
         for gen in generated:
-            gentext = f"{gen.split(sep, 1)[0]}".replace(prompt, "**" + songtitle.upper() + " BY " + artist.upper() + "**\n").replace("\n","<br>") + "<hr>"
+            gentext = f"{gen.split('<|endoftext|>', 1)[0]}".replace(prompt, "**" + songtitle + " BY " + artist + "**\n").replace("\n","<br>") + "<hr>"
             st.markdown(gentext,  unsafe_allow_html=True)
 
 if __name__ == "__main__":
