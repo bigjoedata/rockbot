@@ -1,5 +1,6 @@
-train
+train/
 src/aitextgen/
+src/.SessionState.py.swp
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
