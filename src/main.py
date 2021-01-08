@@ -40,6 +40,7 @@ def display_side_panel_header(txt):
 def load_aitextgen():
     return aitextgen(model="bigjoedata/rockbot") # This is fine-tuned on the 124M token GPT-2 Model
     # return aitextgen(model="bigjoedata/rockbot-distilgpt2") # This is 60% lighter due to being fine-tuned on the reduced Huggingface distilgpt2 Model
+    # return aitextgen(model="bigjoedata/rockbot355M")
 
 @st.cache
 def artistsload():
@@ -47,13 +48,13 @@ def artistsload():
     #df = df.iloc[:, 0].apply(lambda x: x.upper())
     return df
 
-@st.cache(max_entries=1)
-def setart(df, session_id):
+@st.cache(max_entries=1, ttl=1200)
+def setart(df): #session_id):
     randart=random.randint(0, len(df))
     return randart
 
-@st.cache(max_entries=1)
-def settitle(session_id):
+@st.cache(max_entries=1, ttl=1200)
+def settitle(): #(session_id):
     sampletitles=[
         'Love Is A Vampire',
         'The Cards Are Against Humanity',
@@ -72,6 +73,7 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
     nsamples = min(nsamples, 5)
     return ai.generate(
         n=nsamples,
+        #batch_size=1,
         batch_size=nsamples, # disabled to reduce memory usage
         prompt=prefix,
         max_length=length_gen,
@@ -105,10 +107,10 @@ Just have fun.
         """
     display_app_header(main_txt,sub_txt,is_sidebar = False)
     st.markdown(subtitle)
-    session_id = ReportThread.get_report_ctx().session_id
+    #session_id = ReportThread.get_report_ctx().session_id
     artists = artistsload()
-    randart = setart(artists, session_id)
-    randtitle = settitle(session_id)
+    randart = setart(artists) #, session_id)
+    randtitle = settitle() #session_id)
     songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).upper()
     artist = st.selectbox("in the style of: ", artists, randart)
     prompt = songtitle.title() + "\nBY\n" + artist.title() + "\n"
@@ -139,12 +141,12 @@ Just have fun.
             start = time.time()
             generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
             end = time.time()
-            st.markdown("⏲️ " + str(round(end - start)) + "s")
         st.header("Your songs")
         sep = '<|endoftext|>'
         for gen in generated:
             gentext = f"{gen.split('<|endoftext|>', 1)[0]}".replace(prompt, "**" + songtitle + " BY " + artist + "**\n").replace("\n","<br>") + "<hr>"
             st.markdown(gentext,  unsafe_allow_html=True)
+        st.markdown("⏲️ " + str(round(end - start)) + "s")
 
 if __name__ == "__main__":
     main()
