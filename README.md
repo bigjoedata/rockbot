@@ -4,15 +4,19 @@ A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generato
 
 **Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
-Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles), especially if you change the configuration to allow more entropy. I have made no attempt to censor lyrics whatsoever.
+Most language models are imprecise and Rockbot is no exception. You may see NSFW lyrics unexpectedly. I have made no attempts to censor. Generated lyrics may be repetitive and/or incoherent at times, but hopefully you'll encounter something interesting or memorable.
 
-Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
+Oh, and generation is resource intense and can be slow. I set governors on song length to keep generation time somewhat reasonable. You may adjust song length and other parameters on the left or check out [Github](https://github.com/bigjoedata/rockbot) to spin up your own Rockbot.
 
-[Github Repository](https://github.com/bigjoedata/rockbot)
+Just have fun.
+
+[Demo](https://share.streamlit.io/bigjoedata/rockbot/main/src/main.py) Adjust settings to increase speed
+
+[Github](https://github.com/bigjoedata/rockbot)
 
 [GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
 
-[DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/) This is leaner but the lyrics are much more simplistic.
+[DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/) This is leaner with the tradeoff being that the lyrics are more simplistic.
 
 🎹 🪘 🎷 🎺 🪗  🪕 🎻
 ## Background

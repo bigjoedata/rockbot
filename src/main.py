@@ -48,8 +48,12 @@ def artistsload():
     return df
 
 @st.cache(max_entries=1)
-def setseeds(df, session_id):
+def setart(df, session_id):
     randart=random.randint(0, len(df))
+    return randart
+
+@st.cache(max_entries=1)
+def settitle(session_id):
     sampletitles=[
         'Love Is A Vampire',
         'The Cards Are Against Humanity',
@@ -57,12 +61,12 @@ def setseeds(df, session_id):
         'Call A Doctor, It Is Urgent',
         'So, That Just Happened',
         'Dogs Versus Cats',
-        'Entropy Is Overrated',
+        'Parties Are Overrated',
         'I Believe That Is Butter',
         'Panic In The Grocery Store'
     ]
     randtitle = random.choice(sampletitles)
-    return randart, randtitle
+    return randtitle
 
 def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size):
     nsamples = min(nsamples, 5)
@@ -87,38 +91,40 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
 def main():
     st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
     main_txt = """🎸 🥁 Rockbot 🎤 🎧"""
-    sub_txt = ""
+    sub_txt = "Just have fun"
     subtitle = """
-            A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
+A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
-            **Instructions:** Type in a fake song title, pick an artist, click "Generate".
+**Instructions:** Type in a fake song title, pick an artist, click "Generate".
 
-            Note: Due to the nature of language models, lyrics bleed across artists and you may see NSFW lyrics unexpectedly (e.g., from The Beatles), especially if you change the configuration to allow more entropy. I have made no attempt to censor lyrics whatsoever.
+Most language models are imprecise and Rockbot is no exception. You may see NSFW lyrics unexpectedly. I have made no attempts to censor. Generated lyrics may be repetitive and/or incoherent at times, but hopefully you'll encounter something interesting or memorable.
 
-            Finally, these lyrics are computer generated. Not all of these will be non-repetitive and/or coherent. Just have fun.
+Oh, and generation is resource intense and can be slow. I set governors on song length to keep generation time somewhat reasonable. You may adjust song length and other parameters on the left or check out [Github](https://github.com/bigjoedata/rockbot) to spin up your own Rockbot.
 
-            [Github Repository](https://github.com/bigjoedata/rockbot)
-
-            [GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
-
-            [DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/)
+Just have fun.
         """
     display_app_header(main_txt,sub_txt,is_sidebar = False)
     st.markdown(subtitle)
     session_id = ReportThread.get_report_ctx().session_id
     artists = artistsload()
-    randart, randtitle = setseeds(artists, session_id)
+    randart = setart(artists, session_id)
+    randtitle = settitle(session_id)
     songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=randtitle).upper()
     artist = st.selectbox("in the style of: ", artists, randart)
-
     prompt = songtitle.title() + "\nBY\n" + artist.title() + "\n"
+    display_side_panel_header("Rockbot!")
+    st.sidebar.markdown("""
+                        [Github](https://github.com/bigjoedata/rockbot)  
+                        [Primary Model](https://huggingface.co/bigjoedata/rockbot)  
+                        [Distilled Model](https://huggingface.co/bigjoedata/rockbot-distilgpt2/)""")
 
     display_side_panel_header("Configuration")
     nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, 10, 5)
     length_gen = st.sidebar.select_slider(
-    "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 9)], 256
-    ) # Max is really 1024 with this model but set at 512 here to reduce max memory consumption
+    "Song Length (i.e., words/word-pairs) Caution: Larger lengths slow generation considerably: ", [r * 64 for r in range(1, 7)], 192
+    ) # Max is really 1024 with this model but set lower here to reduce max memory consumption
     display_side_panel_header("Fine-Tuning")
+
     temperature = st.sidebar.slider("Choose temperature. Higher means more creative (crazier): ", 0.0, 1.0, 0.7, 0.1)
     topk = st.sidebar.slider("Choose Top K. Limits next word choice to top k guesses; higher is more random:", 0, 50, 40)
     topp = st.sidebar.slider("Choose Top P. Limits next word choice to higher probability; lower is more random:", 0.0, 1.0, 0.9, 0.05)
@@ -129,7 +135,7 @@ def main():
 
 
     if st.button('Generate My Songs!'):
-        with st.spinner("Generating songs, please be patient, this can take a while..."):
+        with st.spinner("Generating songs, please be patient, this can take quite a while. If you adjust anything, you may need to start from scratch."):
             start = time.time()
             generated = generate_text(ai, prompt, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size)
             end = time.time()

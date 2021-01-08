@@ -1,4 +1,5 @@
-/src/aitextgen
+train
+src/aitextgen/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
