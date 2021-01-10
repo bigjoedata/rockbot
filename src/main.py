@@ -70,7 +70,7 @@ def settitle(): #(session_id):
     return randtitle
 
 def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_repeat_ngram_size):
-    nsamples = min(nsamples, 5)
+    batch_size = min(nsamples, 5)
     return ai.generate(
         n=nsamples,
         #batch_size=1,
