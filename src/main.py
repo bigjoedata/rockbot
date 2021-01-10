@@ -36,7 +36,7 @@ def display_side_panel_header(txt):
     """
     st.sidebar.markdown(f'## {txt}')
 
-@st.cache(allow_output_mutation=True, ttl=1200, max_entries=1)
+@st.cache(allow_output_mutation=True, max_entries=1) #ttl=1200,
 def load_aitextgen():
     return aitextgen(model="bigjoedata/rockbot") # This is fine-tuned on the 124M token GPT-2 Model
     # return aitextgen(model="bigjoedata/rockbot-distilgpt2") # This is 60% lighter due to being fine-tuned on the reduced Huggingface distilgpt2 Model
