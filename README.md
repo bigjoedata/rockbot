@@ -1,61 +1,42 @@
 
 # 🎸 🥁 Rockbot 🎤 🎧 
-A [GPT-2](https://openai.com/blog/better-language-models/) based lyrics generator fine-tuned on the writing styles of 16000 songs by 270 artists across MANY genres (not just rock).
 
-**Instructions:** Type in a fake song title, pick an artist, click "Generate".
+A lyrics generator trained from scratch on the writing styles of nearly 20k songs by over 400 artists across MANY musical genres (not just rock), as well as a few poets and comedians.
 
 Most language models are imprecise and Rockbot is no exception. You may see NSFW lyrics unexpectedly. I have made no attempts to censor. Generated lyrics may be repetitive and/or incoherent at times, but hopefully you'll encounter something interesting or memorable.
 
-Oh, and generation is resource intense and can be slow. I set governors on song length to keep generation time somewhat reasonable. You may adjust song length and other parameters on the left or check out [Github](https://github.com/bigjoedata/rockbot) to spin up your own Rockbot.
-
-Just have fun.
-
-[Demo](https://share.streamlit.io/bigjoedata/rockbot/main/src/main.py) Adjust settings to increase speed
-
-[Github](https://github.com/bigjoedata/rockbot)
-
-[GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
-
-[DistilGPT2 version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot-distilgpt2/) This is leaner with the tradeoff being that the lyrics are more simplistic.
-
+---
 🎹 🪘 🎷 🎺 🪗  🪕 🎻
-## Background
-With the shutdown of [Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music) I used Google's takeout function to gather the metadata from artists I've listened to over the past several years. I wanted to take advantage of this bounty to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), then fine tuned [GPT-2's](https://openai.com/blog/better-language-models/) 124M token model using the [AITextGen](https://github.com/minimaxir/aitextgen) framework after considerable post-processing. For more on generation, see [here.](https://huggingface.co/blog/how-to-generate)
+## Rockbot Background
+Two of my passions are music and data! I realized I had a bounty of metadata from artists I've listened to over the past several years and I decided to take advantage to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), added some other selected top artists, did a ton of post-processing and trained a [GPT-2's](https://openai.com/blog/better-language-models/) based model from scratch using the [AITextGen](https://github.com/minimaxir/aitextgen) framework. The UI / back end is built in [Streamlit](https://www.streamlit.io/) The vocabulary was built from scratch, rather than fine-tuned off an existing model. I also fine-tuned a GPT-2 based model available [here](https://huggingface.co/bigjoedata/rockbot) but this model weighs in at a fraction of the size.
 
-### Full Tech Stack
-[Google Play Music](https://en.wikipedia.org/wiki/Google_Play_Music)  (R.I.P.). 
-[Python](https://www.python.org/). 
-[Streamlit](https://www.streamlit.io/). 
-[GPT-2](https://openai.com/blog/better-language-models/). 
-[AITextGen](https://github.com/minimaxir/aitextgen). 
-[Pandas](https://pandas.pydata.org/). 
-[LyricsGenius](https://lyricsgenius.readthedocs.io/en/master/). 
-[Google Colab](https://colab.research.google.com/) (GPU based Training). 
-[Knime](https://www.knime.com/) (data cleaning). 
+A demo is available [here](https://share.streamlit.io/bigjoedata/rockbot/main/src/main.py) Generation is resource intense and can be slow in the demo. I set governors on song length to keep generation time somewhat reasonable. You may adjust song length and other parameters on the left or check out [Github](https://github.com/bigjoedata/rockbot) to spin up your own Rockbot.
 
+Data Prep Cleaning Notes:
+- Removed duplicate lyrics from each song
+- Deduped similar songs based on overall similarity to remove cover versions
+- Removed as much noise / junk as possible. There is still some.
+- Added tokens to delineate song
+- Used language to remove non-English versions of songs
+- Many others!
+
+### Tech Stack and technical notes
+
+ - [Python](https://www.python.org/). 
+ - [Streamlit](https://www.streamlit.io/). 
+ - [GPT-2](https://openai.com/blog/better-language-models/). 
+ - [AITextGen](https://github.com/minimaxir/aitextgen).
+ - [LyricsGenius](https://lyricsgenius.readthedocs.io/en/master/)   (retrieving lyrics for training).
+ - [Knime](https://www.knime.com/) (data cleaning and post processing)
+ - [GPT-2 generation](https://huggingface.co/blog/how-to-generate)
 
 ## How to Use The Model
-Please refer to [AITextGen](https://github.com/minimaxir/aitextgen) for much better documentation.
+Please refer to [AITextGen](https://github.com/minimaxir/aitextgen) and [Huggingface](https://huggingface.co/) for much better documentation.
 
-### Training Parameters Used
-
-    ai.train("lyrics.txt",
-             line_by_line=False,
-             from_cache=False,
-             num_steps=10000,
-             generate_every=2000,
-             save_every=2000,
-             save_gdrive=False,
-             learning_rate=1e-3,
-             batch_size=3,
-             eos_token="<|endoftext|>",
-             #fp16=True
-             )
-###  To Use
-
-
-    Generate With Prompt (Use Title Case):
+    Generate With Prompt (Use lower case for Song Name, First Line):
     Song Name
     BY
-    Artist Name
+    Artist Name (Use unmodified from [Github](https://github.com/bigjoedata/rockbot/blob/main/theartists.parquet)
+    Beginning of song
  
+
