@@ -114,7 +114,7 @@ def main():
     st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
     v_max_chars = int(os.getenv('V_MAX_CHARS', 7)) # Edit to set default max chars as (V_MAX_CHARS-1)*64.  This can be resource intensive so adjust based on your CPU/GPU power. Max per this model is 9 (512 chars)
     v_nsamples = int(os.getenv('V_NSAMPLES', 3)) # Edit to set max songs to generate. Adjust based on your CPU/GPU power.
-    v_default_song_length = int(min(os.getenv('V_DEFAULT_SONG_LENGTH', 7), v_max_chars)) # Computed by (v_default_song_length-1)*64.
+    v_default_song_length = int(min(int(os.getenv('V_DEFAULT_SONG_LENGTH', 7)), v_max_chars)) # Computed by (v_default_song_length-1)*64.
     sep = '<|endoftext|>'
     rando = cacherando()
     session_state = get_session_state(rando)
