@@ -9,7 +9,7 @@ import SessionState
 
 def get_session_state(rando):
     session_state = SessionState.get(random_number=random.random(), randart='',
-                    randtitle='', prompt='', nsamples='', length_gen='', temperature='', topk='', topp='', no_repeat_ngram_size='', songfirstline='', gentext='', firstgen=0, ttg=0)
+                    randtitle='', prompt='', nsamples='', length_gen='', temperature='', topk='', topp='', no_repeat_ngram_size='', songfirstline='', generated='', firstgen=0, ttg=0)
     return session_state
 
 @st.cache()
@@ -66,7 +66,7 @@ def setart(df, rando): #session_id):
     return randart
 
 @st.cache(max_entries=1)
-def settitle(rando): #(session_id):
+def settitle(rando):
     sampletitles=[
         "Love Is A Vampire",
         "The Cards Are Against Humanity",
@@ -111,6 +111,7 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
 
 def main():
     st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
+    sep = '<|endoftext|>'
     rando = cacherando()
     session_state = get_session_state(rando)
     main_txt = """🎸 🥁 Rockbot 🎤 🎧"""
@@ -154,18 +155,17 @@ Most language models are imprecise and Rockbot is no exception. You may see NSFW
         st.markdown('---')
         with st.spinner("Generating songs, please be patient, this can take quite a while. If you adjust anything, you may need to start from scratch."):
             start = time.time()
-            generated = generate_text(ai, session_state.prompt, session_state.nsamples, session_state.length_gen, session_state.temperature,
+            session_state.generated = generate_text(ai, session_state.prompt, session_state.nsamples, session_state.length_gen, session_state.temperature,
                 session_state.topk, session_state.topp, session_state.no_repeat_ngram_size)
             end = time.time()
             session_state.ttg = str(round(end - start)) + "s"
         st.header("Your song(s):")
-        sep = '<|endoftext|>'
-        for gen in generated:
-            session_state.gentext = f"{gen.split(sep, 1)[0]}".replace(
+    if session_state.firstgen > 0:
+        for gen in session_state.generated:
+            genned = f"{gen.split(sep, 1)[0]}".replace(
                     session_state.prompt, "**" + session_state.songtitle + " BY " + session_state.artist + "**\n" + session_state.songfirstline + " ").replace(
                     "\n","<br>") + "<hr>"
-    if session_state.firstgen > 0:
-        st.markdown(session_state.gentext,  unsafe_allow_html=True)
+            st.markdown(genned,  unsafe_allow_html=True)
         st.markdown("⏲️ Time To Generate: " + session_state.ttg)
     else:
         st.write("*Lyrics will appear here after you click the 'Generate' button*")
