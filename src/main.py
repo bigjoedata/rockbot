@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import streamlit as st
 from aitextgen import aitextgen
@@ -111,6 +112,9 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
 
 def main():
     st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
+    v_max_chars = os.getenv('V_MAX_CHARS', 7) # Edit to set default max chars as (V_MAX_CHARS-1)*64.  This can be resource intensive so adjust based on your CPU/GPU power. Max per this model is 9 (512 chars)
+    v_nsamples = os.getenv('V_NSAMPLES', 3) # Edit to set max songs to generate. Adjust based on your CPU/GPU power.
+    v_default_song_length = min(os.getenv('V_DEFAULT_SONG_LENGTH', 7), v_max_chars) # Computed by (v_default_song_length-1)*64.
     sep = '<|endoftext|>'
     rando = cacherando()
     session_state = get_session_state(rando)
@@ -133,12 +137,12 @@ Most language models are imprecise and Rockbot is no exception. You may see NSFW
     session_state.randtitle = settitle(rando) #session_id)
     session_state.songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=session_state.randtitle).lower()
     session_state.artist = st.selectbox("in the style of: ", artists, session_state.randart)
-    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=512).lower()
+    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=(v_max_chars-1)*64).lower()
     session_state.prompt = session_state.songtitle + "\nBY\n" + session_state.artist + "\n" + session_state.songfirstline
     display_side_panel_header("Configuration")
-    session_state.nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, 3, 1)
+    session_state.nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, v_nsamples, 1)
     session_state.length_gen = st.sidebar.select_slider(
-    "Song Length (i.e., words parts) Note: This is set low for demo purposes; songs may end abruptly: ", [r * 64 for r in range(1, 7)], 192
+    "Song Length (i.e., words parts) Note: This is set low for demo purposes; songs may end abruptly: ", [r * 64 for r in range(1, v_max_chars)], 64*(v_default_song_length - 1)
     ) # Max is currently 512 with this model but set lower here to reduce computational intensity
     display_side_panel_header("Fine-Tuning")
 
@@ -204,14 +208,23 @@ Data Prep Cleaning Notes:
 ## How to Use The Model
 Please refer to [AITextGen](https://github.com/minimaxir/aitextgen) and [Huggingface](https://huggingface.co/) for much better documentation.
 
-###  To Use
-
     Generate With Prompt (Use lower case for Song Name, First Line):
     Song Name
     BY
     Artist Name (Use unmodified from [Github](https://github.com/bigjoedata/rockbot/blob/main/theartists.parquet)
     Beginning of song
+ 
+## Spin up your own with Docker
+Running your own is very easy. Visit my [Streamlit-Plus repository](https://github.com/bigjoedata/streamlit-plus) for more details on the image build
 
+ - Install [Docker Compose](https://docs.docker.com/compose/install/)
+ - Follow the following steps
+```
+git clone https://github.com/bigjoedata/streamlit-plus
+cd streamlit-plus
+nano docker-compose.yml # Edit environmental variables for max song length and max songs to generate to match your computing power (higher is more resource intensive)
+docker-compose up -d # launch in daemon (background) mode
+```
     """)
 
 

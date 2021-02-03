@@ -1,11 +1,3 @@
-
-# 🎸 🥁 Rockbot 🎤 🎧 
-
-A lyrics generator trained from scratch on the writing styles of nearly 20k songs by over 400 artists across MANY musical genres (not just rock), as well as a few poets and comedians.
-
-Most language models are imprecise and Rockbot is no exception. You may see NSFW lyrics unexpectedly. I have made no attempts to censor. Generated lyrics may be repetitive and/or incoherent at times, but hopefully you'll encounter something interesting or memorable.
-
----
 🎹 🪘 🎷 🎺 🪗  🪕 🎻
 ## Rockbot Background
 Two of my passions are music and data! I realized I had a bounty of metadata from artists I've listened to over the past several years and I decided to take advantage to build something fun. I scraped the top 50 lyrics for artists I'd listened to at least once from [Genius](https://genius.com/), added some other selected top artists, did a ton of post-processing and trained a [GPT-2's](https://openai.com/blog/better-language-models/) based model from scratch using the [AITextGen](https://github.com/minimaxir/aitextgen) framework. The UI / back end is built in [Streamlit](https://www.streamlit.io/) The vocabulary was built from scratch, rather than fine-tuned off an existing model. I also fine-tuned a GPT-2 based model available [here](https://huggingface.co/bigjoedata/rockbot) but this model weighs in at a fraction of the size.
@@ -39,4 +31,14 @@ Please refer to [AITextGen](https://github.com/minimaxir/aitextgen) and [Hugging
     Artist Name (Use unmodified from [Github](https://github.com/bigjoedata/rockbot/blob/main/theartists.parquet)
     Beginning of song
  
+## Spin up your own with Docker
+Running your own is very easy. Visit my [Streamlit-Plus repository](https://github.com/bigjoedata/streamlit-plus) for more details on the image build
 
+ - Install [Docker Compose](https://docs.docker.com/compose/install/)
+ - Follow the following steps
+```
+git clone https://github.com/bigjoedata/streamlit-plus
+cd streamlit-plus
+nano docker-compose.yml # Edit environmental variables for max song length and max songs to generate to match your computing power (higher is more resource intensive)
+docker-compose up -d # launch in daemon (background) mode
+```
