@@ -112,9 +112,9 @@ def generate_text(ai, prefix, nsamples, length_gen, temperature, topk, topp, no_
 
 def main():
     st.set_page_config(page_title='Rockbot') #layout='wide', initial_sidebar_state='auto'
-    v_max_chars = os.getenv('V_MAX_CHARS', 7) # Edit to set default max chars as (V_MAX_CHARS-1)*64.  This can be resource intensive so adjust based on your CPU/GPU power. Max per this model is 9 (512 chars)
-    v_nsamples = os.getenv('V_NSAMPLES', 3) # Edit to set max songs to generate. Adjust based on your CPU/GPU power.
-    v_default_song_length = min(os.getenv('V_DEFAULT_SONG_LENGTH', 7), v_max_chars) # Computed by (v_default_song_length-1)*64.
+    v_max_chars = int(os.getenv('V_MAX_CHARS', 7)) # Edit to set default max chars as (V_MAX_CHARS-1)*64.  This can be resource intensive so adjust based on your CPU/GPU power. Max per this model is 9 (512 chars)
+    v_nsamples = int(os.getenv('V_NSAMPLES', 3)) # Edit to set max songs to generate. Adjust based on your CPU/GPU power.
+    v_default_song_length = int(min(os.getenv('V_DEFAULT_SONG_LENGTH', 7), v_max_chars)) # Computed by (v_default_song_length-1)*64.
     sep = '<|endoftext|>'
     rando = cacherando()
     session_state = get_session_state(rando)
@@ -137,7 +137,7 @@ Most language models are imprecise and Rockbot is no exception. You may see NSFW
     session_state.randtitle = settitle(rando) #session_id)
     session_state.songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=session_state.randtitle).lower()
     session_state.artist = st.selectbox("in the style of: ", artists, session_state.randart)
-    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=64*(v_max_chars-1)).lower()
+    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=64*(int(v_max_chars)-1)).lower()
     session_state.prompt = session_state.songtitle + "\nBY\n" + session_state.artist + "\n" + session_state.songfirstline
     display_side_panel_header("Configuration")
     session_state.nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, v_nsamples, 1)
