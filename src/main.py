@@ -137,7 +137,7 @@ Most language models are imprecise and Rockbot is no exception. You may see NSFW
     session_state.randtitle = settitle(rando) #session_id)
     session_state.songtitle = st.text_input('Your Fake Song Title (Type in your own!):', value=session_state.randtitle).lower()
     session_state.artist = st.selectbox("in the style of: ", artists, session_state.randart)
-    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=(v_max_chars-1)*64).lower()
+    session_state.songfirstline = st.text_area('The First Words Of The Song (OPTIONAL):', height=2, max_chars=64*(v_max_chars-1)).lower()
     session_state.prompt = session_state.songtitle + "\nBY\n" + session_state.artist + "\n" + session_state.songfirstline
     display_side_panel_header("Configuration")
     session_state.nsamples = st.sidebar.slider("Number of Songs To Generate: ", 1, v_nsamples, 1)
