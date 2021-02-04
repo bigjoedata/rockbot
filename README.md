@@ -37,8 +37,8 @@ Running your own is very easy. Visit my [Streamlit-Plus repository](https://gith
  - Install [Docker Compose](https://docs.docker.com/compose/install/)
  - Follow the following steps
 ```
-git clone https://github.com/bigjoedata/streamlit-plus
-cd streamlit-plus
+git clone https://github.com/bigjoedata/rockbot
+cd rockbot
 nano docker-compose.yml # Edit environmental variables for max song length and max songs to generate to match your computing power (higher is more resource intensive)
 docker-compose up -d # launch in daemon (background) mode
 ```
