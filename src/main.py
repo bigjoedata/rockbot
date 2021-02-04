@@ -175,9 +175,12 @@ Most language models are imprecise and Rockbot is no exception. You may see NSFW
         st.write("*Lyrics will appear here after you click the 'Generate' button*")
     display_side_panel_header("Links:")
     st.sidebar.markdown("""
-- [Github](https://github.com/bigjoedata/rockbot)
-- [Model](https://huggingface.co/bigjoedata/rockbot-scratch)
-- [GPT-2 124M version Model page on Hugging Face](https://huggingface.co/bigjoedata/rockbot)
+Rockbot!  
+[Rockbot](https://github.com/bigjoedata/rockbot)  
+[Rockbot Demo](https://share.streamlit.io/bigjoedata/rockbot/main/src/main.py)  
+**Related:**  
+[Jekyll & Hyde Bot](https://github.com/bigjoedata/jekyllhydebot)  
+[Demo](https://share.streamlit.io/bigjoedata/jekyllhydebot/main/src/main.py) 
     """)
     st.markdown("""
 ---
